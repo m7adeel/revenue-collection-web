@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Building2, CreditCard, Download, Filter, Home, Loader2, MoreVertical, Plus, Search, RefreshCw } from "lucide-react"
+import { Building2, CreditCard, Download, Filter, Home, Loader2, MoreVertical, Plus, Search, RefreshCw, PenIcon, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -559,12 +559,13 @@ export default function PropertiesPage() {
                                   View Details
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleEditClick(property)}>
-                                  <Home className="h-4 w-4 mr-2" />
+                                  <PenIcon className="h-4 w-4 mr-2" />
                                   Edit Property
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  <CreditCard className="h-4 w-4 mr-2" />
-                                  Collect Tax
+                                <DropdownMenuItem onClick={() => {
+                                }}>
+                                  <Trash className="h-4 w-4 mr-2" />
+                                  Delete
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>

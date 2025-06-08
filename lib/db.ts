@@ -61,7 +61,7 @@ export async function initDatabase() {
 
   // Example structure:
   // - users table
-  // - vendors table
+  // - payers table
   // - collections table
   // - properties table
   // - syncQueue table (for tracking items that need to be synced)
@@ -100,7 +100,7 @@ export async function addCollection(collection: Omit<Collection, "id" | "status"
 // Add a vendor (works offline)
 export async function addVendor(vendor: Omit<Vendor, "id" | "status" | "properties" | "lastPayment">) {
   // This would:
-  // 1. Add to vendors table
+  // 1. Add to payers table
   // 2. Add to syncQueue
   // 3. Return the new vendor with a temporary ID
 
@@ -122,10 +122,10 @@ export async function getCollections() {
   return []
 }
 
-// Get all vendors (works offline)
-export async function getVendors() {
-  // This would return all vendors from the local database
+// Get all payers (works offline)
+export async function getpayers() {
+  // This would return all payers from the local database
 
-  console.log("Getting vendors")
+  console.log("Getting payers")
   return []
 }

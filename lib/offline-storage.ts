@@ -5,7 +5,7 @@ const DB_NAME = "tax-collection-db"
 const DB_VERSION = 1
 const STORES = {
   collections: "collections",
-  vendors: "vendors",
+  payers: "payers",
   properties: "properties",
   syncQueue: "syncQueue",
   users: "users",
@@ -40,10 +40,10 @@ export async function initDatabase() {
         collectionsStore.createIndex("date", "date", { unique: false })
       }
 
-      if (!db.objectStoreNames.contains(STORES.vendors)) {
-        const vendorsStore = db.createObjectStore(STORES.vendors, { keyPath: "id", autoIncrement: true })
-        vendorsStore.createIndex("name", "name", { unique: false })
-        vendorsStore.createIndex("type", "type", { unique: false })
+      if (!db.objectStoreNames.contains(STORES.payers)) {
+        const payersStore = db.createObjectStore(STORES.payers, { keyPath: "id", autoIncrement: true })
+        payersStore.createIndex("name", "name", { unique: false })
+        payersStore.createIndex("type", "type", { unique: false })
       }
 
       if (!db.objectStoreNames.contains(STORES.properties)) {

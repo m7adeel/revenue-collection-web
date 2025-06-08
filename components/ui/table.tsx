@@ -1,19 +1,45 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { Pagination } from "./pagination"
 
-const Table = React.forwardRef<
-  HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
-    <table
-      ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
-      {...props}
-    />
-  </div>
-))
+interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
+  pagination?: {
+    currentPage: number
+    pageSize: number
+    totalItems: number
+    onPageChange: (page: number) => void
+    onPageSizeChange: (size: number) => void
+  }
+}
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, pagination, children, ...props }, ref) => {
+    const totalPages = pagination ? Math.ceil(pagination.totalItems / pagination.pageSize) : 1
+
+    return (
+      <div className="space-y-4">
+        <div className="relative w-full overflow-auto">
+          <table
+            ref={ref}
+            className={cn("w-full caption-bottom text-sm", className)}
+            {...props}
+          />
+        </div>
+        {pagination && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={totalPages}
+            pageSize={pagination.pageSize}
+            totalItems={pagination.totalItems}
+            onPageChange={pagination.onPageChange}
+            onPageSizeChange={pagination.onPageSizeChange}
+          />
+        )}
+      </div>
+    )
+  }
+)
 Table.displayName = "Table"
 
 const TableHeader = React.forwardRef<

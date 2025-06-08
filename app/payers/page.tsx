@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Building2, CreditCard, Download, Filter, Loader2, MoreVertical, Phone, Plus, Search, User } from "lucide-react"
+import { Building2, CreditCard, Download, Filter, Home, Loader2, MoreVertical, PenIcon, Phone, Plus, Search, Trash, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -49,8 +49,8 @@ interface Category {
   description: string
 }
 
-export default function VendorsPage() {
-  const [vendors, setVendors] = useState<Vendor[]>([])
+export default function payersPage() {
+  const [payers, setpayers] = useState<Vendor[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedVendor, setSelectedVendor] = useState<any>(null)
@@ -78,7 +78,7 @@ export default function VendorsPage() {
         title: "Success",
         description: "Vendor added successfully",
       })
-      fetchVendors()
+      fetchpayers()
     } catch (error) {
       toast({
         title: "Error",
@@ -90,7 +90,7 @@ export default function VendorsPage() {
     }
   }
 
-  const fetchVendors = async () => {
+  const fetchpayers = async () => {
     const { data, error } = await supabase
       .from("payer")
       .select("*")
@@ -101,7 +101,7 @@ export default function VendorsPage() {
       return
     }
 
-    const vendors = data.map((vendor) => ({
+    const payers = data.map((vendor) => ({
       id: vendor.id,
       tin: vendor.tin,
       name: vendor.first_name + " " + vendor.last_name,
@@ -115,7 +115,7 @@ export default function VendorsPage() {
       lastPayment: vendor.last_payment_date,
     }))
 
-    setVendors(vendors)
+    setpayers(payers)
   }
 
   const fetchCategories = async () => {
@@ -152,7 +152,7 @@ export default function VendorsPage() {
   }
 
   useEffect(() => {
-    fetchVendors()
+    fetchpayers()
     fetchCategories()
   }, [])
 
@@ -161,7 +161,7 @@ export default function VendorsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Vendors</h1>
+            <h1 className="text-2xl font-bold">Payers</h1>
             <p className="text-gray-500">Manage taxpayers and their information</p>
           </div>
 
@@ -172,11 +172,11 @@ export default function VendorsPage() {
           <Card>
             <CardHeader className="pb-3">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <CardTitle>Vendor Directory</CardTitle>
+                <CardTitle>Payer Directory</CardTitle>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                    <Input type="search" placeholder="Search vendors..." className="pl-8 w-full sm:w-[250px]" />
+                    <Input type="search" placeholder="Search payers..." className="pl-8 w-full sm:w-[250px]" />
                   </div>
                   <Button variant="outline" size="icon">
                     <Filter className="h-4 w-4" />
@@ -210,7 +210,7 @@ export default function VendorsPage() {
                         </tr>
                       </thead>
                       <tbody className="[&_tr:last-child]:border-0">
-                        {vendors.map((vendor) => (
+                        {payers.map((vendor) => (
                           <tr
                             key={vendor.id}
                             className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
@@ -257,13 +257,14 @@ export default function VendorsPage() {
                                     View Profile
                                   </DropdownMenuItem>
                                   <DropdownMenuItem>
-                                    <CreditCard className="h-4 w-4 mr-2" />
-                                    Collect Payment
+                                    <PenIcon className="h-4 w-4 mr-2" />
+                                    Edit Profile
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem>
-                                    <Building2 className="h-4 w-4 mr-2" />
-                                    Manage Properties
-                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => {
+                                    }}>
+                                      <Trash className="h-4 w-4 mr-2" />
+                                      Delete
+                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </td>
@@ -294,7 +295,7 @@ export default function VendorsPage() {
           categories={categories}
           onClose={() => setSelectedVendor(null)}
           onUpdate={() => {
-            fetchVendors()
+            fetchpayers()
             setSelectedVendor(null)
           }}
         />
@@ -496,7 +497,7 @@ function NewVendorDialog({ onSave, categories, isLoading }: { onSave: (data: any
   )
 }
 
-const sampleVendors = [
+const samplepayers = [
   {
     id: 1,
     name: "Johnson Enterprises",

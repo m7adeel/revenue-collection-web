@@ -1,4 +1,5 @@
 import { supabase } from "@/utils/supabase"
+import { getUserData } from "./utils";
 
 const getTodayCollections = async () => {
     // get total amount collected today
@@ -42,7 +43,7 @@ const getNewPayers = async () => {
     };
 }
 
-const getVendorsVisited = async () => {
+const getpayersVisited = async () => {
     const data = await supabase.from("payment").select("payer_id,created_at")
 
     const getUniquePayers = (payers) => {
@@ -98,9 +99,9 @@ const getRecentPayments = async () => {
     return data || [];
 }
 
-const getRecentVendors = async () => {
-    const vendors = await supabase.from("payer").select().order("created_date_time", { ascending: false }).limit(5);
-    return vendors.data || [];
+const getRecentpayers = async () => {
+    const payers = await supabase.from("payer").select().order("created_date_time", { ascending: false }).limit(5);
+    return payers.data || [];
 }
 
 const createAdmin = async (email: string, password: string, userData: object) => {
@@ -126,14 +127,6 @@ const createAdmin = async (email: string, password: string, userData: object) =>
         },
         body: body,
     })
-
-    // const data = await res.json()
-
-    if (res.ok) {
-        console.log('User created:', data.user)
-    } else {
-        console.error('Error:', data.error)
-    }
 }
 
 const addPayer = async (payer) => {
@@ -167,9 +160,9 @@ const addPayer = async (payer) => {
 
     const data = await res.json()
     return data
- }
+}
 
-const addPayment = async (payment) => { 
+const addPayment = async (payment) => {
     const body = JSON.stringify({
         payer_id: payment.payer_id,
         amount: payment.amount,
@@ -197,98 +190,111 @@ const addPayment = async (payment) => {
 
     const data = await res.json()
     return data
- }
+}
 
 interface InvoiceInput {
-  payer_id: string;
-  amount_due: number;
-  due_date: string;
-  notes?: string;
-  status: string;
-  ref_no: string;
-  property_id?: string;
+    payer: string;
+    amount_due: number;
+    due_date: string;
+    notes?: string;
+    status: string;
+    ref_no: string;
 }
 
 const addInvoice = async (invoice: InvoiceInput) => {
-  const body = JSON.stringify({
-    payer_id: invoice.payer_id,
-    amount_due: invoice.amount_due,
-    due_date: invoice.due_date,
-    notes: invoice.notes || '',
-    status: invoice.status,
-    ref_no: invoice.ref_no,
-    property_id: invoice.property_id,
-    created_by: (await supabase.auth.getUser()).data.user?.id,
-    last_modified_date: new Date().toISOString()
-  })
+    const userData = await getUserData();
 
-  const res = await fetch('/api/invoice', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: body,
-  })
+    const body = JSON.stringify({
+        payer: invoice.payer,
+        amount_due: invoice.amount_due,
+        due_date: invoice.due_date,
+        notes: invoice.notes || '',
+        status: invoice.status,
+        ref_no: invoice.ref_no,
+        created_by: userData.id,
+        last_modified_date: new Date().toISOString(),
+    })
 
-  if (!res.ok) {
-    throw new Error('Failed to create invoice')
-  }
+    const res = await fetch('/api/invoice', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: body,
+    })
 
-  const data = await res.json()
-  return data
+    if (!res.ok) {
+        throw new Error('Failed to create invoice')
+    }
+
+    const data = await res.json()
+    return data
 }
 
 interface PropertyInput {
-  owner: string;
-  property_ref_no: string;
-  address: string;
-  geo_location: string;
-  assess_payment: string;
-  payment_expiry_date: string;
-  type: string;
-  notes?: string;
-  images?: string;
+    owner: string;
+    property_ref_no: string;
+    address: string;
+    geo_location: string;
+    assess_payment: string;
+    payment_expiry_date: string;
+    type: string;
+    notes?: string;
+    images?: string;
 }
 
-const addProperty = async (property: PropertyInput) => { 
-  const body = JSON.stringify({
-    owner: property.owner,
-    property_ref_no: property.property_ref_no,
-    address: property.address,
-    geo_location: property.geo_location,
-    assess_payment: property.assess_payment,
-    payment_expiry_date: property.payment_expiry_date,
-    type: property.type,
-    notes: property.notes || '',
-    images: property.images || '',
-    last_modified_date: new Date().toISOString()
-  })
+const addProperty = async (property: PropertyInput) => {
+    const body = JSON.stringify({
+        owner: property.owner,
+        property_ref_no: property.property_ref_no,
+        address: property.address,
+        geo_location: property.geo_location,
+        assess_payment: property.assess_payment,
+        payment_expiry_date: property.payment_expiry_date,
+        type: property.type,
+        notes: property.notes || '',
+        images: property.images || '',
+        last_modified_date: new Date().toISOString()
+    })
 
-  const res = await fetch('/api/property', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: body,
-  })
+    const res = await fetch('/api/property', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: body,
+    })
 
-  if (!res.ok) {
-    throw new Error('Failed to create property')
-  }
+    if (!res.ok) {
+        throw new Error('Failed to create property')
+    }
 
-  const data = await res.json()
-  return data
+    const data = await res.json()
+    return data
+}
+
+const getUserData = async () => {
+    const user = await supabase.auth.getUser();
+    const userData = await supabase.from("user").select("*").eq("user_auth_id", user.data.user?.id).single();
+
+    const data = {
+        ...userData.data,
+        email: user.data.user?.email
+    }
+
+    return data;
 }
 
 export {
     getTodayCollections,
     getNewPayers,
-    getVendorsVisited,
+    getpayersVisited,
     getRecentPayments,
-    getRecentVendors,
+    getRecentpayers,
     createAdmin,
     addPayer,
     addPayment,
     addInvoice,
-    addProperty
+    addProperty,
+    getUserData
 }

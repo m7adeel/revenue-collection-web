@@ -4,7 +4,7 @@
 - The application uses a shared table component (`components/ui/table.tsx`)
 - Multiple dashboards use tables for data display:
   - Invoices (`app/invoices/page.tsx`)
-  - Vendors (`app/vendors/page.tsx`)
+  - Payers (`app/payers/page.tsx`)
   - Properties (`app/properties/page.tsx`)
   - Collections (`app/collections/page.tsx`)
   - Collectors (`app/collectors/page.tsx`)
@@ -56,11 +56,11 @@ const paginatedData = data.slice(
 - Maintain sort order across pages
 - Implementation file: `app/invoices/page.tsx`
 
-#### 3.2 Vendors Dashboard
+#### 3.2 Payers Dashboard
 - Implement pagination for vendor list
 - Update vendor search functionality
 - Maintain filter state across pages
-- Implementation file: `app/vendors/page.tsx`
+- Implementation file: `app/payers/page.tsx`
 
 #### 3.3 Properties Dashboard
 - Add pagination to property list

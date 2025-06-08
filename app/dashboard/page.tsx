@@ -8,12 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import DashboardLayout from "@/components/dashboard-layout"
 import { supabase } from "@/utils/supabase"
-import { getNewPayers, getRecentPayments, getRecentVendors, getTodayCollections, getVendorsVisited } from "@/services/db"
+import { getNewPayers, getRecentPayments, getRecentpayers, getTodayCollections, getpayersVisited } from "@/services/db"
 
 interface User {
   name: string
@@ -70,13 +69,13 @@ export default function DashboardPage() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [todayCollections, setTodayCollections] = useState(0)
 
-  const [vendorsVisited, setVendorsVisited] = useState({
+  const [payersVisited, setpayersVisited] = useState({
     today: 0,
     yesterday: 0,
     changePercentage: 0
   })
   const [recentCollections, setRecentCollections] = useState([]);
-  const [recentVendors, setRecentVendors] = useState([]);
+  const [recentpayers, setRecentpayers] = useState([]);
   const [collectionAmount, setCollectionAmount] = useState({
     today: 0,
     yesterday: 0,
@@ -125,7 +124,6 @@ export default function DashboardPage() {
       if (error) {
         console.error("Error fetching today's collections:", error)
       } else {
-        console.log(data)
         setTodayCollections(data.length)
       }
     }
@@ -136,8 +134,8 @@ export default function DashboardPage() {
     getTodayCollections().then((data) => setCollectionAmount(data));
     getNewPayers().then((data) => setNewPayers(data));
 
-    getVendorsVisited().then((data) => {
-      setVendorsVisited(data)
+    getpayersVisited().then((data) => {
+      setpayersVisited(data)
     });
 
     getRecentPayments().then((data) => {
@@ -154,8 +152,8 @@ export default function DashboardPage() {
       setRecentCollections(transformedData)
     })
 
-    getRecentVendors().then((data) => {
-      const transformedVendors = data.map(vendor => ({
+    getRecentpayers().then((data) => {
+      const transformedpayers = data.map(vendor => ({
         id: vendor.id,
         name: `${vendor.first_name} ${vendor.last_name}`,
         initials: `${vendor.first_name[0]}${vendor.last_name[0]}`.toUpperCase(),
@@ -165,7 +163,7 @@ export default function DashboardPage() {
         phone: vendor.phone
       }))
 
-      setRecentVendors(transformedVendors)
+      setRecentpayers(transformedpayers)
     })
   },[])
 
@@ -222,9 +220,9 @@ export default function DashboardPage() {
         />
         <StatCard
           icon={<Users className="h-5 w-5 text-emerald-600" />}
-          title="Vendors Visited"
-          value={`${vendorsVisited.today || 0}`}
-          change={`${vendorsVisited.changePercentage.toFixed(2)}%`}
+          title="Payers Visited"
+          value={`${payersVisited.today || 0}`}
+          change={`${payersVisited.changePercentage.toFixed(2)}%`}
           isPositive={true}
         />
         <StatCard
@@ -250,7 +248,7 @@ export default function DashboardPage() {
             <h2 className="text-xl font-semibold">Recent Activity</h2>
             <TabsList>
               <TabsTrigger value="collections">Collections</TabsTrigger>
-              <TabsTrigger value="vendors">Vendors</TabsTrigger>
+              <TabsTrigger value="payers">Payers</TabsTrigger>
             </TabsList>
           </div>
 
@@ -277,22 +275,22 @@ export default function DashboardPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="vendors" className="space-y-4">
+          <TabsContent value="payers" className="space-y-4">
             <Card>
               <CardHeader className="py-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-base">Recent Vendors</CardTitle>
-                    <CardDescription>Recently added or updated vendors</CardDescription>
+                    <CardTitle className="text-base">Recent Payers</CardTitle>
+                    <CardDescription>Recently added or updated payers</CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => router.push("/vendors")}>
+                  <Button variant="outline" size="sm" onClick={() => router.push("/payers")}>
                     View All
                   </Button>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="border-t">
-                  {recentVendors.map((vendor) => (
+                  {recentpayers.map((vendor) => (
                     <VendorItem key={vendor.id} vendor={vendor} />
                   ))}
                 </div>
@@ -313,7 +311,7 @@ export default function DashboardPage() {
               description="Record a new tax payment"
             />
           </Link>
-          <Link href="/vendors" className="w-full">
+          <Link href="/payers" className="w-full">
             <ActionCard
               icon={<Users className="h-6 w-6 text-emerald-600" />}
               title="Add Vendor"
@@ -390,18 +388,6 @@ function CollectionItem({ collection }: CollectionItemProps) {
       <div className="flex items-center space-x-4">
         <p className="font-semibold">${collection.amount}</p>
         <Badge variant={collection.status === "Synced" ? "default" : "outline"}>{collection.status}</Badge>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>View Details</DropdownMenuItem>
-            <DropdownMenuItem>Print Receipt</DropdownMenuItem>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </div>
   )
@@ -566,7 +552,7 @@ function DashboardSkeleton() {
   )
 }
 
-const recentVendors = [
+const recentpayers = [
   {
     id: 1,
     name: "Johnson Enterprises",

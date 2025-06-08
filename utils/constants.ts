@@ -45,10 +45,16 @@ const DB_SYNC_STATUS = {
     CONFLICTED: 'conflicted',
 }
 
+const USER_ROLES = {
+    ADMIN: 'Admin',
+    TAX_COLLECTOR: 'Tax Collector',
+}
+
 export {
     PAYMENT_METHODS,
     BUSINESS_TYPES,
     INVOICE_STATUS,
     PROPERTY_TYPES,
-    DB_SYNC_STATUS
+    DB_SYNC_STATUS,
+    USER_ROLES
 }

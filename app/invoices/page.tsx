@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Building2, CreditCard, Download, Filter, Home, Loader2, MoreVertical, Plus, Search, RefreshCw } from "lucide-react"
+import { Building2, CreditCard, Download, Filter, Home, Loader2, MoreVertical, Plus, Search, RefreshCw, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -25,6 +25,7 @@ import { supabase } from "@/utils/supabase"
 import { INVOICE_STATUS } from "@/utils/constants"
 import { useAuthStore } from "@/providers/authStoreProvider"
 import { addInvoice } from "@/services/db"
+import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table"
 
 interface Payer {
   id: number
@@ -46,12 +47,9 @@ interface Invoice {
   due_date: string
   notes: string
   status: string
-  payer_id: number
-  property_id: number
   ref_no: string
   last_modified_date: string
   payer?: Payer
-  property?: Property
   created_by?: {
     id: string
     first_name: string
@@ -76,11 +74,11 @@ interface FilterState {
 
 interface NewInvoiceFormData {
   ref_no: string
-  amount_due: string
+  payer: string
+  amount_due: number
   due_date: string
   notes: string
-  payer_id: string
-  property_id: string
+  status: string
 }
 
 export default function Invoices() {
@@ -107,24 +105,26 @@ export default function Invoices() {
   })
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const { user } = useAuthStore()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalItems, setTotalItems] = useState(0)
 
   const handleNewInvoice = async (formData: NewInvoiceFormData) => {
     try {
       setIsLoading(true)
       
-      if (!formData.payer_id) {
+      if (!formData.payer) {
         throw new Error('Please select a payer')
       }
 
       // Create the invoice object
       const invoice = {
-        payer_id: formData.payer_id,
+        payer: formData.payer,
         amount_due: Number(formData.amount_due),
         due_date: formData.due_date,
         notes: formData.notes,
         status: INVOICE_STATUS.UNPAID,
-        ref_no: formData.ref_no,
-        property_id: formData.property_id,
+        ref_no: formData.ref_no
       }
 
       // Save to database
@@ -138,8 +138,7 @@ export default function Invoices() {
         due_date: formData.due_date,
         notes: formData.notes,
         status: INVOICE_STATUS.UNPAID,
-        payer_id: Number(formData.payer_id),
-        property_id: Number(formData.property_id),
+        payer: Number(formData.payer),
         ref_no: formData.ref_no,
         last_modified_date: new Date().toISOString(),
       }
@@ -160,12 +159,11 @@ export default function Invoices() {
 
       // Create the update object
       const updateData = {
-        payer_id: formData.payer_id,
+        payer: formData.payer.id,
         amount_due: Number(formData.amount_due),
         due_date: formData.due_date,
         notes: formData.notes,
         ref_no: formData.ref_no,
-        property_id: formData.property_id,
         status: formData.status,
         last_modified_date: new Date().toISOString(),
       }
@@ -285,13 +283,30 @@ export default function Invoices() {
         (!filters.amountRange.max || invoice.amount_due <= Number(filters.amountRange.max))
 
       // Payer filter
-      const payerMatch = filters.payer === '' || invoice.payer_id === Number(filters.payer)
+      const payerMatch = filters.payer === '' || invoice.payer === Number(filters.payer)
 
       return searchMatch && statusMatch && dateMatch && amountMatch && payerMatch
     })
 
     setFilteredInvoices(filtered)
   }, [invoices, filters])
+
+  // Calculate paginated data
+  const paginatedInvoices = filteredInvoices.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  )
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  // Handle page size change
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size)
+    setCurrentPage(1) // Reset to first page when changing page size
+  }
 
   return (
     <DashboardLayout>
@@ -496,16 +511,17 @@ export default function Invoices() {
                                   <Building2 className="h-4 w-4 mr-2" />
                                   View Details
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  <CreditCard className="h-4 w-4 mr-2" />
-                                  Record Payment
-                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => {
                                   setSelectedInvoice(invoice)
                                   setIsEditDialogOpen(true)
                                 }}>
                                   <Home className="h-4 w-4 mr-2" />
                                   Edit Invoice
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => {
+                                }}>
+                                  <Trash className="h-4 w-4 mr-2" />
+                                  Delete
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -560,11 +576,12 @@ function NewInvoiceDialog({
 }) {
   const [formData, setFormData] = useState<NewInvoiceFormData>({
     ref_no: generateReferenceNumber(),
-    amount_due: '',
+    payer: '',
+    payer: '',
+    amount_due: 0,
     due_date: '',
     notes: '',
-    payer_id: '',
-    property_id: ''
+    status: INVOICE_STATUS.UNPAID
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -584,8 +601,8 @@ function NewInvoiceDialog({
       newErrors.due_date = 'Due date must be in the future'
     }
 
-    if (!formData.payer_id) {
-      newErrors.payer_id = 'Payer is required'
+    if (!formData.payer) {
+      newErrors.payer = 'Payer is required'
     }
 
     setErrors(newErrors)
@@ -708,18 +725,18 @@ function NewInvoiceDialog({
               <h3 className="text-lg font-semibold">Related Information</h3>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="payer_id">Payer</Label>
+                  <Label htmlFor="payer">Payer</Label>
                   <Select
-                    name="payer_id"
-                    value={formData.payer_id}
+                    name="payer"
+                    value={formData.payer}
                     onValueChange={(value) => {
-                      setFormData(prev => ({ ...prev, payer_id: value }))
-                      if (errors.payer_id) {
-                        setErrors(prev => ({ ...prev, payer_id: '' }))
+                      setFormData(prev => ({ ...prev, payer: value }))
+                      if (errors.payer) {
+                        setErrors(prev => ({ ...prev, payer: '' }))
                       }
                     }}
                   >
-                    <SelectTrigger className={errors.payer_id ? "border-red-500" : ""}>
+                    <SelectTrigger className={errors.payer ? "border-red-500" : ""}>
                       <SelectValue placeholder="Select payer" />
                     </SelectTrigger>
                     <SelectContent>
@@ -730,8 +747,8 @@ function NewInvoiceDialog({
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.payer_id && (
-                    <p className="text-sm text-red-500 mt-1">{errors.payer_id}</p>
+                  {errors.payer && (
+                    <p className="text-sm text-red-500 mt-1">{errors.payer}</p>
                   )}
                 </div>
                 <div>
@@ -889,10 +906,12 @@ function EditInvoiceDialog({
 }) {
   const [formData, setFormData] = useState<NewInvoiceFormData>({
     ref_no: invoice.ref_no,
-    amount_due: invoice.amount_due.toString(),
+    payer: invoice.payer ? `${invoice.payer.first_name} ${invoice.payer.last_name}` : '',
+    payer: invoice.payer.toString(),
+    amount_due: Number(invoice.amount_due),
     due_date: invoice.due_date,
     notes: invoice.notes || '',
-    payer_id: invoice.payer_id,
+    status: invoice.status
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -1015,9 +1034,9 @@ function EditInvoiceDialog({
               <h3 className="text-lg font-semibold">Related Information</h3>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="payer_id">Payer</Label>
+                  <Label htmlFor="payer">Payer</Label>
                   <Input
-                    id="payer_id"
+                    id="payer"
                     value={`${invoice.payer?.first_name} ${invoice.payer?.last_name}`}
                     disabled
                     className="bg-gray-50"

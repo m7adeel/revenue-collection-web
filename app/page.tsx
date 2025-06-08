@@ -65,7 +65,7 @@ export default function Home() {
               <FeatureCard
                 icon={<Users className="h-10 w-10 text-emerald-600" />}
                 title="Vendor Management"
-                description="Easily register and manage vendors with comprehensive profiles and payment histories."
+                description="Easily register and manage payers with comprehensive profiles and payment histories."
               />
               <FeatureCard
                 icon={<BarChart3 className="h-10 w-10 text-emerald-600" />}

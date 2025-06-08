@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { BarChart3, Building2, CreditCard, Home, Layers, LogOut, MapPin, Menu, Settings, Users, X } from "lucide-react"
+import { BarChart3, Building2, CreditCard, Home, Layers, LogOut, MapPin, Menu, Settings, Users, X, Banknote } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -67,10 +67,10 @@ export default function DashboardLayout({ children }) {
                 <span className="ml-3">Collections</span>
               </Button>
             </Link>
-            <Link href="/vendors" className="block">
-              <Button variant={isActive("/vendors") ? "secondary" : "ghost"} className="w-full justify-start">
+            <Link href="/payers" className="block">
+              <Button variant={isActive("/payers") ? "secondary" : "ghost"} className="w-full justify-start">
                 <Users className="h-5 w-5" />
-                <span className="ml-3">Vendors</span>
+                <span className="ml-3">Payers</span>
               </Button>
             </Link>
             <Link href="/properties" className="block">
@@ -81,14 +81,15 @@ export default function DashboardLayout({ children }) {
             </Link>
             <Link href="/invoices" className="block">
               <Button variant={isActive("/invoices") ? "secondary" : "ghost"} className="w-full justify-start">
-                <Layers className="h-5 w-5" />
+                {/* <Layers className="h-5 w-5" /> */}
+                <Banknote className="h-5 w-5"/>
                 <span className="ml-3">Invoices</span>
               </Button>
             </Link>
             <Link href="/collectors" className="block">
-              <Button variant={isActive("/map") ? "secondary" : "ghost"} className="w-full justify-start">
+              <Button variant={isActive("/collectors") ? "secondary" : "ghost"} className="w-full justify-start">
                 <MapPin className="h-5 w-5" />
-                <span className="ml-3">Map View</span>
+                <span className="ml-3">Collectors</span>
               </Button>
             </Link>
             <Link href="/reports" className="block">
@@ -171,10 +172,10 @@ export default function DashboardLayout({ children }) {
                       </Link>
                     </div>
                     <div onClick={handleNavigation}>
-                      <Link href="/vendors" className="block">
-                        <Button variant={isActive("/vendors") ? "secondary" : "ghost"} className="w-full justify-start">
+                      <Link href="/payers" className="block">
+                        <Button variant={isActive("/payers") ? "secondary" : "ghost"} className="w-full justify-start">
                           <Users className="h-5 w-5" />
-                          <span className="ml-3">Vendors</span>
+                          <span className="ml-3">Payers</span>
                         </Button>
                       </Link>
                     </div>
@@ -193,7 +194,7 @@ export default function DashboardLayout({ children }) {
                       <Link href="/collectors" className="block">
                         <Button variant={isActive("/collectors") ? "secondary" : "ghost"} className="w-full justify-start">
                           <MapPin className="h-5 w-5" />
-                          <span className="ml-3">Map View</span>
+                          <span className="ml-3">Collectors</span>
                         </Button>
                       </Link>
                     </div>

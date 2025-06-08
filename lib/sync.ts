@@ -26,14 +26,12 @@ export function initSync() {
 // Handle coming online
 function handleOnline() {
   isOnline = true
-  console.log("App is online")
   attemptSync()
 }
 
 // Handle going offline
 function handleOffline() {
   isOnline = false
-  console.log("App is offline")
 }
 
 // Attempt to sync data with server

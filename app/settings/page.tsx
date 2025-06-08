@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Bell, Database, Loader2, Lock, RefreshCw, Save, Shield, Wifi, WifiOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,7 +11,8 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import DashboardLayout from "@/components/dashboard-layout"
-import { createAdmin } from "@/services/db"
+import { createAdmin, getUserData } from "@/services/db"
+import { USER_ROLES } from "@/utils/constants"
 
 export default function SettingsPage() {
   const [isOnline, setIsOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true)
@@ -39,6 +40,12 @@ export default function SettingsPage() {
     password: "",
   })
 
+  useEffect(() => {
+    getUserData().then((data) => {
+      setUser(data)
+    })
+  }, [])
+
   const handleSaveProfile = () => {
     setIsSaving(true)
 
@@ -65,15 +72,6 @@ export default function SettingsPage() {
   }
 
   const handleAddAdmin = () => {
-    // // Here you would typically make an API call to create the admin
-    // console.log('New admin data:', {
-    //   ...newAdmin,
-    //   created_by: user.name, // Using current user as creator
-    //   created_date: new Date().toISOString(),
-    //   last_modified_date: new Date().toISOString(),
-    //   last_modified_by: user.name,
-    // })
-
     createAdmin(newAdmin.email, newAdmin.password, newAdmin)
   }
 
@@ -88,7 +86,7 @@ export default function SettingsPage() {
         <TabsList className="mb-6">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="sync">Sync</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          {/* <TabsTrigger value="notifications">Notifications</TabsTrigger> */}
           <TabsTrigger value="security">Security</TabsTrigger>
         </TabsList>
 
@@ -171,7 +169,7 @@ export default function SettingsPage() {
             </CardFooter>
           </Card>
 
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Preferences</CardTitle>
               <CardDescription>Customize your application experience</CardDescription>
@@ -212,7 +210,7 @@ export default function SettingsPage() {
                 <Switch id="dark-mode" />
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </TabsContent>
 
         <TabsContent value="sync" className="space-y-6">
@@ -521,9 +519,7 @@ export default function SettingsPage() {
                       <SelectValue placeholder="Select admin role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="super-admin">Super Administrator</SelectItem>
-                      <SelectItem value="admin">Administrator</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
+                      {Object.entries(USER_ROLES).map(([key, value]) => <SelectItem value={key} key={key}>{value}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>

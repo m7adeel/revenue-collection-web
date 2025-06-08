@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, ReactElement } from "react"
-import { CreditCard, Download, Filter, Loader2, MapPin, MoreVertical, Plus, Printer, Search } from "lucide-react"
+import { CreditCard, Download, Filter, Loader2, MapPin, MoreVertical, PenIcon, Plus, Printer, Search, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -232,16 +232,16 @@ export default function CollectionsPage() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem>
-                                  <Printer className="h-4 w-4 mr-2" />
-                                  Print Receipt
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
                                   <CreditCard className="h-4 w-4 mr-2" />
                                   View Details
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                  <MapPin className="h-4 w-4 mr-2" />
-                                  View on Map
+                                  <PenIcon className="h-4 w-4 mr-2" />
+                                  Edit Details
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Trash className="h-4 w-4 mr-2" />
+                                  Delete
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>

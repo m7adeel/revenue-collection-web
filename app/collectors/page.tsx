@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Building2, CreditCard, Download, Filter, Home, Loader2, MapPin, MoreVertical, Plus, Search, RefreshCw, Users } from "lucide-react"
+import { Building2, CreditCard, Download, Filter, Home, Loader2, MapPin, MoreVertical, Plus, Search, RefreshCw, Users, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -154,8 +154,6 @@ export default function CollectorsPage() {
       //   .single()
 
       // if (collectorError) throw collectorError
-
-      console.log(formData)
 
 
       await fetch('/api/create-collector', {
@@ -377,6 +375,12 @@ export default function CollectorsPage() {
                                 }}>
                                   <Home className="h-4 w-4 mr-2" />
                                   Edit Collector
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => {
+                                  
+                                }}>
+                                  <Trash className="h-4 w-4 mr-2" />
+                                  Delete
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>

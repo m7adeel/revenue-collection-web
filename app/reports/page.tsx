@@ -77,7 +77,7 @@ export default function ReportsPage() {
                     <SelectContent>
                       <SelectItem value="collections">Collections Summary</SelectItem>
                       <SelectItem value="collectors">Collector Performance</SelectItem>
-                      <SelectItem value="vendors">Vendor Compliance</SelectItem>
+                      <SelectItem value="payers">Vendor Compliance</SelectItem>
                       <SelectItem value="areas">Area Analysis</SelectItem>
                     </SelectContent>
                   </Select>
