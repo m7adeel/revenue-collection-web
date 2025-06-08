@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import DashboardLayout from "@/components/dashboard-layout"
 import { supabase } from "@/utils/supabase"
 import { useAuthStore } from "@/providers/authStoreProvider"
+import { toast } from "@/hooks/use-toast"
 
 interface Collector {
   id: string
@@ -128,33 +129,6 @@ export default function CollectorsPage() {
   const handleNewCollector = async (formData: NewCollectorFormData) => {
     try {
       setIsLoading(true)
-      
-      // Create auth user
-      // const { data: authData, error: authError } = await supabase.auth.signUp({
-      //   email: formData.email,
-      //   password: formData.password,
-      // })
-
-      // if (authError) throw authError
-
-      // // Create collector record
-      // const { data: collector, error: collectorError } = await supabase
-      //   .from('user')
-      //   .insert({
-      //     first_name: formData.first_name,
-      //     last_name: formData.last_name,
-      //     phone: formData.phone,
-      //     profile: formData.profile,
-      //     active: true,
-      //     user_auth_id: authData.user?.id,
-      //     created_date: new Date().toISOString(),
-      //     last_modified_date: new Date().toISOString(),
-      //   })
-      //   .select()
-      //   .single()
-
-      // if (collectorError) throw collectorError
-
 
       await fetch('/api/create-collector', {
         method: 'POST',

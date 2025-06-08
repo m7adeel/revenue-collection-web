@@ -105,6 +105,7 @@ const getRecentpayers = async () => {
 }
 
 const createAdmin = async (email: string, password: string, userData: object) => {
+    const signedUserData = await getUserData()
 
     if (!email || !password) {
         throw new Error('Email and password are required');
@@ -117,7 +118,7 @@ const createAdmin = async (email: string, password: string, userData: object) =>
         last_name: userData.last_name || '',
         phone: userData.phone || '',
         default_payment_method: userData.default_payment_method || '',
-        current_user_id: (await supabase.auth.getUser()).data.user?.id || '',
+        current_user_id: signedUserData.id || '',
     });
 
     const res = await fetch('/api/create-user', {
