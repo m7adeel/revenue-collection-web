@@ -353,7 +353,7 @@ function NewVendorDialog({ onSave, categories, isLoading }: { onSave: (data: any
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          New Vendor
+          New Payer
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">

@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import DashboardLayout from "@/components/dashboard-layout"
 import { createAdmin, getUserData } from "@/services/db"
-import { USER_ROLES } from "@/utils/constants"
+import { PAYMENT_METHODS, USER_ROLES } from "@/utils/constants"
 
 export default function SettingsPage() {
   const [isOnline, setIsOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true)
@@ -26,6 +26,7 @@ export default function SettingsPage() {
     last_name: "Doe",
     phone: "",
     default_payment_method: "",
+    profile: ''
   })
 
   const [newAdmin, setNewAdmin] = useState({
@@ -42,17 +43,13 @@ export default function SettingsPage() {
 
   useEffect(() => {
     getUserData().then((data) => {
+      console.log(data)
       setUser(data)
     })
   }, [])
 
   const handleSaveProfile = () => {
-    setIsSaving(true)
-
-    // Simulate saving
-    setTimeout(() => {
-      setIsSaving(false)
-    }, 1500)
+    
   }
 
   const handleSync = () => {
@@ -119,10 +116,10 @@ export default function SettingsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
+                    disabled
                     id="email"
                     type="email"
                     value={user.email}
-                    onChange={(e) => setUser({ ...user, email: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
@@ -145,11 +142,21 @@ export default function SettingsPage() {
                     <SelectValue placeholder="Select default payment method" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="card">Card</SelectItem>
-                    <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                    {PAYMENT_METHODS.map((item) => {
+                      return (
+                        <SelectItem value={item}>{item}</SelectItem>
+                      )
+                    })}
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="profile">Profile</Label>
+                <Input
+                    disabled
+                    id="profile"
+                    value={user.profile || ""}
+                  />
               </div>
             </CardContent>
             <CardFooter>

@@ -187,8 +187,9 @@ export default function DashboardPage() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("user")
-    router.push("/login")
+    supabase.auth.signOut().then(() => {
+      router.replace('/login')
+    })
   }
 
   const handleNavigation = () => {
@@ -303,7 +304,7 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div>
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <Link href="/collections" className="w-full">
             <ActionCard
               icon={<CreditCard className="h-6 w-6 text-emerald-600" />}
@@ -323,13 +324,6 @@ export default function DashboardPage() {
               icon={<Layers className="h-6 w-6 text-emerald-600" />}
               title="Add Property"
               description="Register a new property"
-            />
-          </Link>
-          <Link href="/reports" className="w-full">
-            <ActionCard
-              icon={<BarChart3 className="h-6 w-6 text-emerald-600" />}
-              title="Generate Report"
-              description="Create collection reports"
             />
           </Link>
         </div>

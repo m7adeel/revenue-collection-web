@@ -274,16 +274,10 @@ const addProperty = async (property: PropertyInput) => {
     return data
 }
 
-const getUserData = async () => {
-    const user = await supabase.auth.getUser();
-    const userData = await supabase.from("user").select("*").eq("user_auth_id", user.data.user?.id).single();
+const updateUser = async (userData) => {
+    
 
-    const data = {
-        ...userData.data,
-        email: user.data.user?.email
-    }
-
-    return data;
+    
 }
 
 export {
