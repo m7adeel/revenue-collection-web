@@ -23,8 +23,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import DashboardLayout from "@/components/dashboard-layout"
 import { supabase } from "@/utils/supabase"
-import { addPayment } from "@/services/db"
+import { addPayment, deletePayment } from "@/services/db"
 import { useAuthStore } from "@/store/auth"
+import { toast } from "@/hooks/use-toast"
 
 interface FormData {
   vendorName: string;
@@ -39,7 +40,7 @@ interface FormData {
 }
 
 interface Collection {
-  id: number;
+  id: string;
   vendor: {
     name: string;
     initials: string;
@@ -239,7 +240,26 @@ export default function CollectionsPage() {
                                   <PenIcon className="h-4 w-4 mr-2" />
                                   Edit Details
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => {
+                                      deletePayment(collection.id).then((response) => {
+                                        toast({
+                                          title: "Payment Deleted",
+                                          description: "The payment has been successfully deleted.",
+                                          variant: 'default'
+                                        })
+                                      }).catch((error) => {
+                                        console.error("Error deleting payment:", error)
+                                        toast({
+                                          title: "Error",
+                                          description: "Failed to delete payment. Please try again.",
+                                          variant: 'destructive'
+                                        })
+                                      })
+                                      setCollections((prev) => prev.filter((c) => c.id !== collection.id))
+                                    }
+                                  }
+                                >
                                   <Trash className="h-4 w-4 mr-2" />
                                   Delete
                                 </DropdownMenuItem>

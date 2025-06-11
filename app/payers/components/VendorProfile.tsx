@@ -80,6 +80,7 @@ export default function VendorProfile({ vendor, categories, onClose, onUpdate }:
       toast({
         title: "Success",
         description: "Vendor profile updated successfully",
+        variant: "default"
       })
       setIsEditing(false)
       onUpdate()

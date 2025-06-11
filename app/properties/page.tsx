@@ -23,10 +23,10 @@ import DashboardLayout from "@/components/dashboard-layout"
 import { PROPERTY_TYPES } from "@/utils/constants"
 import { Textarea } from "@/components/ui/textarea"
 import { supabase } from "@/utils/supabase"
-import { addProperty } from "@/services/db"
+import { addProperty, deleteProperty } from "@/services/db"
 
 interface Property {
-  id: number;
+  id: string;
   property_ref_no: string;
   address: string;
   geo_location: string;
@@ -563,6 +563,8 @@ export default function PropertiesPage() {
                                   Edit Property
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => {
+                                  deleteProperty(property.id)
+                                  setProperties(prev => prev.filter(p => p.id !== property.id))
                                 }}>
                                   <Trash className="h-4 w-4 mr-2" />
                                   Delete

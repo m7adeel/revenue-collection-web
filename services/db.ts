@@ -275,9 +275,75 @@ const addProperty = async (property: PropertyInput) => {
 }
 
 const updateUser = async (userData) => {
-    
+    const { data, error } = await supabase
+        .from('user')
+        .update({
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            phone: userData.phone,
+            profile: userData.profile,
+            default_payment_method: userData.default_payment_method,
+            last_modified_date: new Date().toISOString()
+        })
+        .eq('id', userData.id)
+        .select()
 
-    
+    if (error) {
+        throw new Error('Failed to update user', error)
+    }
+
+    return data[0]
+}
+
+const updatePassword = async (currentPassword: string, newPassword: string) => {
+    const currentUser = (await supabase.auth.getUser()).data.user;
+
+    // First verify the current password
+    const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
+        email: currentUser?.email!,
+        password: currentPassword
+    })
+
+    if (signInError) {
+        throw new Error('Current password is incorrect')
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+    })
+
+    if (updateError) {
+        throw new Error('Failed to update password')
+    }
+
+    return true
+}
+
+const deleteItem = async (table: string, id: string) => {
+    const { error } = await supabase
+        .from(table)
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id)
+    if (error) {
+        throw new Error(`Failed to delete item from ${table}: ${error.message}`);
+    }
+    return true;
+}
+
+const deletePayer = async (id: string) => {
+    await deleteItem('payer', id);
+}
+
+const deletePayment = async (id: string) => {
+    await deleteItem('payment', id);
+}
+
+const deleteInvoice = async (id: string) => {
+    await deleteItem('invoice', id);
+}
+
+const deleteProperty = async (id: string) => {
+    await deleteItem('property', id);
 }
 
 export {
@@ -291,5 +357,11 @@ export {
     addPayment,
     addInvoice,
     addProperty,
-    getUserData
+    getUserData,
+    updateUser,
+    updatePassword,
+    deletePayer,
+    deletePayment,
+    deleteInvoice,
+    deleteProperty
 }

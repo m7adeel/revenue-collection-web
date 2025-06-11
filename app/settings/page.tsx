@@ -11,13 +11,21 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import DashboardLayout from "@/components/dashboard-layout"
-import { createAdmin, getUserData } from "@/services/db"
+import { createAdmin, getUserData, updatePassword, updateUser } from "@/services/db"
 import { PAYMENT_METHODS, USER_ROLES } from "@/utils/constants"
+import { useToast } from "@/hooks/use-toast"
 
 export default function SettingsPage() {
   const [isOnline, setIsOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true)
   const [isSaving, setIsSaving] = useState(false)
   const [isSyncing, setIsSyncing] = useState(false)
+  const { toast } = useToast()
+
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+
   const [user, setUser] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
@@ -43,13 +51,24 @@ export default function SettingsPage() {
 
   useEffect(() => {
     getUserData().then((data) => {
-      console.log(data)
       setUser(data)
     })
   }, [])
 
   const handleSaveProfile = () => {
-    
+    updateUser(user).then(() => {
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+        variant: 'default'
+      })
+    }).catch((error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive"
+      })
+    })
   }
 
   const handleSync = () => {
@@ -70,6 +89,59 @@ export default function SettingsPage() {
 
   const handleAddAdmin = () => {
     createAdmin(newAdmin.email, newAdmin.password, newAdmin)
+      .then(() => {
+        toast({
+          title: "Success",
+          description: "Admin user created successfully",
+          variant: 'default'
+        })
+      })
+      .catch((error) => {
+        toast({
+          title: "Error",
+          description: "Failed to create admin user",
+          variant: "destructive"
+        })
+      })
+  }
+
+  const updateUserPassword = () => {
+    const currentPassword = (document.getElementById('current-password') as HTMLInputElement).value;
+    const newPassword = (document.getElementById('new-password') as HTMLInputElement).value;
+    const confirmPassword = (document.getElementById('confirm-password') as HTMLInputElement).value;
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "New password and confirm password do not match",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast({
+        title: "Error",
+        description: "All password fields are required",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    updatePassword(currentPassword, newPassword).then(() => {
+      toast({
+        title: "Success",
+        description: "Password updated successfully",
+        variant: 'default'
+      })
+    }
+    ).catch((error) => {
+      toast({
+        title: "Error",
+        description: `Failed to update password ${error.message}`,
+        variant: "destructive"
+      })
+    });
   }
 
   return (
@@ -175,49 +247,6 @@ export default function SettingsPage() {
               </Button>
             </CardFooter>
           </Card>
-
-          {/* <Card>
-            <CardHeader>
-              <CardTitle>Preferences</CardTitle>
-              <CardDescription>Customize your application experience</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="language">Language</Label>
-                <Select defaultValue="en">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="timezone">Timezone</Label>
-                <Select defaultValue="utc-5">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select timezone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="utc-8">Pacific Time (UTC-8)</SelectItem>
-                    <SelectItem value="utc-7">Mountain Time (UTC-7)</SelectItem>
-                    <SelectItem value="utc-6">Central Time (UTC-6)</SelectItem>
-                    <SelectItem value="utc-5">Eastern Time (UTC-5)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="dark-mode">Dark Mode</Label>
-                  <p className="text-sm text-gray-500">Enable dark mode for the application</p>
-                </div>
-                <Switch id="dark-mode" />
-              </div>
-            </CardContent>
-          </Card> */}
         </TabsContent>
 
         <TabsContent value="sync" className="space-y-6">
@@ -288,46 +317,6 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* <Card>
-            <CardHeader>
-              <CardTitle>Storage Management</CardTitle>
-              <CardDescription>Manage local storage and data retention</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Local Storage Usage</Label>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div className="bg-emerald-600 h-2.5 rounded-full w-[45%]"></div>
-                </div>
-                <p className="text-sm text-gray-500">45% of 500MB used (225MB)</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="data-retention">Data Retention</Label>
-                <Select defaultValue="90">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select retention period" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="30">30 days</SelectItem>
-                    <SelectItem value="60">60 days</SelectItem>
-                    <SelectItem value="90">90 days</SelectItem>
-                    <SelectItem value="180">6 months</SelectItem>
-                    <SelectItem value="365">1 year</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-gray-500">
-                  Older data will be removed from local storage but remains on the server
-                </p>
-              </div>
-              <div className="pt-2">
-                <Button variant="outline" className="w-full">
-                  <Database className="mr-2 h-4 w-4" />
-                  Clear Local Cache
-                </Button>
-              </div>
-            </CardContent>
-          </Card> */}
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6">
@@ -396,52 +385,12 @@ export default function SettingsPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button>
+              <Button onClick={updateUserPassword}>
                 <Lock className="mr-2 h-4 w-4" />
                 Update Password
               </Button>
             </CardFooter>
           </Card>
-
-          {/* <Card>
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>Manage your account security settings</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="two-factor">Two-Factor Authentication</Label>
-                  <p className="text-sm text-gray-500">Add an extra layer of security to your account</p>
-                </div>
-                <Switch id="two-factor" />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="session-timeout">Session Timeout</Label>
-                  <p className="text-sm text-gray-500">Automatically log out after inactivity</p>
-                </div>
-                <Select defaultValue="30">
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select timeout" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="15">15 minutes</SelectItem>
-                    <SelectItem value="30">30 minutes</SelectItem>
-                    <SelectItem value="60">1 hour</SelectItem>
-                    <SelectItem value="120">2 hours</SelectItem>
-                    <SelectItem value="never">Never</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="pt-2">
-                <Button variant="outline" className="w-full">
-                  <Shield className="mr-2 h-4 w-4" />
-                  View Login History
-                </Button>
-              </div>
-            </CardContent>
-          </Card> */}
 
           <Card>
             <CardHeader>
@@ -549,7 +498,7 @@ export default function SettingsPage() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label htmlFor="admin-auth-id">User Auth ID</Label>
                 <Input 
                   id="admin-auth-id" 
@@ -558,12 +507,12 @@ export default function SettingsPage() {
                   onChange={(e) => handleAdminChange('user_auth_id', e.target.value)}
                 />
                 <p className="text-sm text-gray-500">This ID will be provided by Supabase Auth after user registration</p>
-              </div>
+              </div> */}
 
               <div className="pt-4 space-y-2 text-sm text-gray-500">
-                <p>Created by: {user.name}</p>
+                <p>Created by: {user.first_name} {user.last_name}</p>
                 <p>Created date: {new Date().toLocaleDateString()}</p>
-                <p>Last modified by: {user.name}</p>
+                <p>Last modified by: {user.first_name} {user.last_name}</p>
                 <p>Last modified date: {new Date().toLocaleDateString()}</p>
               </div>
             </CardContent>

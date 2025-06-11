@@ -24,8 +24,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { supabase } from "@/utils/supabase"
 import { INVOICE_STATUS } from "@/utils/constants"
 import { useAuthStore } from "@/providers/authStoreProvider"
-import { addInvoice } from "@/services/db"
+import { addInvoice, deleteInvoice } from "@/services/db"
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table"
+import { useToast } from "@/hooks/use-toast"
 
 interface Payer {
   id: number
@@ -41,7 +42,7 @@ interface Property {
 }
 
 interface Invoice {
-  id: number
+  id: string
   date: string
   amount_due: number
   due_date: string
@@ -82,6 +83,8 @@ interface NewInvoiceFormData {
 }
 
 export default function Invoices() {
+  const { toast } = useToast();
+
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([])
   const [payers, setPayers] = useState<Payer[]>([])
@@ -519,6 +522,8 @@ export default function Invoices() {
                                   Edit Invoice
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => {
+                                  deleteInvoice(invoice.id)
+                                  setInvoices(invoices.filter(inv => inv.id !== invoice.id))
                                 }}>
                                   <Trash className="h-4 w-4 mr-2" />
                                   Delete

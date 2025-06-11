@@ -24,6 +24,7 @@ import DashboardLayout from "@/components/dashboard-layout"
 import { supabase } from "@/utils/supabase"
 import { useAuthStore } from "@/providers/authStoreProvider"
 import { toast } from "@/hooks/use-toast"
+import { deletePayer } from "@/services/db"
 
 interface Collector {
   id: string
@@ -130,6 +131,15 @@ export default function CollectorsPage() {
     try {
       setIsLoading(true)
 
+      if(formData.profile.toLowerCase() === 'admin') {
+        toast({
+          title: 'Error',
+          description: 'Cannot create a collector with profile "admin". Please choose a different profile.',
+          variant: 'destructive'
+        })
+        return
+      }
+
       await fetch('/api/create-collector', {
         method: 'POST',
         body: JSON.stringify(formData)
@@ -137,10 +147,21 @@ export default function CollectorsPage() {
         if (res.ok) {
           setCollectors([formData, ...collectors])
           setIsLoading(false)
+
+          toast({
+            title: 'Collector Created',
+            description: `Collector ${formData.first_name} ${formData.last_name} has been created successfully.`,
+            variant: 'default'
+          })
         }
         throw new Error('Failed to create collector')
       }).catch((error) => {
         console.error('Error creating collector:', error)
+        toast({
+          title: 'Error',
+          description: 'Failed to create collector. Please try again.',
+          variant: 'destructive'
+        })
       })
       
     } catch (error) {
@@ -175,9 +196,21 @@ export default function CollectorsPage() {
         c.id === selectedCollector.id ? collector : c
       ))
 
+      toast({
+        title: 'Collector Updated',
+        description: `Collector ${formData.first_name} ${formData.last_name} has been updated successfully.`,
+        variant: 'default'
+      })
+
       setIsEditDialogOpen(false)
     } catch (error) {
       console.error('Error updating collector:', error)
+
+      toast({
+        title: 'Error',
+        description: 'Failed to update collector. Please try again.',
+        variant: 'destructive'
+      })
     } finally {
       setIsLoading(false)
     }
@@ -351,7 +384,13 @@ export default function CollectorsPage() {
                                   Edit Collector
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => {
-                                  
+                                  // deletePayer(collector.id)
+                                  toast({
+                                    title: 'Collector Deleted',
+                                    description: `Collector ${collector.first_name} ${collector.last_name} has been deleted.`,
+                                    variant: 'default'
+                                  })
+                                  setCollectors(prev => prev.filter(c => c.id !== collector.id))
                                 }}>
                                   <Trash className="h-4 w-4 mr-2" />
                                   Delete

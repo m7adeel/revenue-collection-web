@@ -24,7 +24,7 @@ import DashboardLayout from "@/components/dashboard-layout"
 import { BUSINESS_TYPES } from "@/utils/constants"
 import { Switch } from "@/components/ui/switch"
 import { supabase } from "@/utils/supabase"
-import { addPayer } from "@/services/db"
+import { addPayer, deletePayer } from "@/services/db"
 import CategoryManagement from "./components/CategoryManagement"
 import { useToast } from "@/components/ui/use-toast"
 import VendorProfile from "./components/VendorProfile"
@@ -76,13 +76,14 @@ export default function payersPage() {
       await addPayer(payer)
       toast({
         title: "Success",
-        description: "Vendor added successfully",
+        description: "Payer added successfully",
+        variant: "default",
       })
       fetchpayers()
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to add vendor",
+        description: "Failed to add payer",
         variant: "destructive",
       })
     } finally {
@@ -97,7 +98,11 @@ export default function payersPage() {
       .is("deleted_at", null)
 
     if (error) {
-      console.error(error)
+      toast({
+        title: "Error",
+        description: "Failed to fetch payers",
+        variant: "destructive",
+      })
       return
     }
 
@@ -261,7 +266,9 @@ export default function payersPage() {
                                     Edit Profile
                                   </DropdownMenuItem>
                                   <DropdownMenuItem onClick={() => {
-                                    }}>
+                                    deletePayer(vendor.id)
+                                    setpayers((prev) => prev.filter((p) => p.id !== vendor.id))
+                                  }}>
                                       <Trash className="h-4 w-4 mr-2" />
                                       Delete
                                     </DropdownMenuItem>
