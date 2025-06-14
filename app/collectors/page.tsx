@@ -128,10 +128,7 @@ export default function CollectorsPage() {
   }, [collectors, filters])
 
   const handleNewCollector = async (formData: NewCollectorFormData) => {
-    try {
-      setIsLoading(true)
-
-      if(formData.profile.toLowerCase() === 'admin') {
+    if(formData.profile.toLowerCase() === 'admin') {
         toast({
           title: 'Error',
           description: 'Cannot create a collector with profile "admin". Please choose a different profile.',
@@ -139,6 +136,9 @@ export default function CollectorsPage() {
         })
         return
       }
+
+    try {
+      setIsLoading(true)
 
       await fetch('/api/create-collector', {
         method: 'POST',
