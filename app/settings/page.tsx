@@ -169,18 +169,18 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="first-name">First Name</Label>
-                  <Input 
-                    id="first-name" 
-                    value={user.first_name || ""} 
-                    onChange={(e) => setUser({ ...user, first_name: e.target.value })} 
+                  <Input
+                    id="first-name"
+                    value={user.first_name || ""}
+                    onChange={(e) => setUser({ ...user, first_name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="last-name">Last Name</Label>
-                  <Input 
-                    id="last-name" 
-                    value={user.last_name || ""} 
-                    onChange={(e) => setUser({ ...user, last_name: e.target.value })} 
+                  <Input
+                    id="last-name"
+                    value={user.last_name || ""}
+                    onChange={(e) => setUser({ ...user, last_name: e.target.value })}
                   />
                 </div>
               </div>
@@ -206,7 +206,7 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="default-payment">Default Payment Method</Label>
-                <Select 
+                <Select
                   value={user.default_payment_method || ""}
                   onValueChange={(value) => setUser({ ...user, default_payment_method: value })}
                 >
@@ -225,10 +225,10 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label htmlFor="profile">Profile</Label>
                 <Input
-                    disabled
-                    id="profile"
-                    value={user.profile || ""}
-                  />
+                  disabled
+                  id="profile"
+                  value={user.profile || ""}
+                />
               </div>
             </CardContent>
             <CardFooter>
@@ -392,113 +392,114 @@ export default function SettingsPage() {
             </CardFooter>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Add Admin User</CardTitle>
-              <CardDescription>Add a new administrator to the system</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="admin-active">Active Status</Label>
-                  <p className="text-sm text-gray-500">Enable or disable the admin account</p>
+          {user.profile.toLowerCase() == 'admin' &&
+            <Card>
+              <CardHeader>
+                <CardTitle>Add Admin User</CardTitle>
+                <CardDescription>Add a new administrator to the system</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="admin-active">Active Status</Label>
+                    <p className="text-sm text-gray-500">Enable or disable the admin account</p>
+                  </div>
+                  <Switch
+                    id="admin-active"
+                    checked={newAdmin.active}
+                    onCheckedChange={(checked) => handleAdminChange('active', checked)}
+                  />
                 </div>
-                <Switch 
-                  id="admin-active" 
-                  checked={newAdmin.active}
-                  onCheckedChange={(checked) => handleAdminChange('active', checked)}
-                />
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="admin-first-name">First Name</Label>
-                  <Input 
-                    id="admin-first-name" 
-                    placeholder="Enter first name"
-                    value={newAdmin.first_name}
-                    onChange={(e) => handleAdminChange('first_name', e.target.value)}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="admin-first-name">First Name</Label>
+                    <Input
+                      id="admin-first-name"
+                      placeholder="Enter first name"
+                      value={newAdmin.first_name}
+                      onChange={(e) => handleAdminChange('first_name', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="admin-last-name">Last Name</Label>
+                    <Input
+                      id="admin-last-name"
+                      placeholder="Enter last name"
+                      value={newAdmin.last_name}
+                      onChange={(e) => handleAdminChange('last_name', e.target.value)}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="admin-last-name">Last Name</Label>
-                  <Input 
-                    id="admin-last-name" 
-                    placeholder="Enter last name"
-                    value={newAdmin.last_name}
-                    onChange={(e) => handleAdminChange('last_name', e.target.value)}
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="admin-email">Email</Label>
-                  <Input 
-                    id="admin-email" 
-                    type="email"
-                    placeholder="Enter email address"
-                    value={newAdmin.email}
-                    onChange={(e) => handleAdminChange('email', e.target.value)}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="admin-email">Email</Label>
+                    <Input
+                      id="admin-email"
+                      type="email"
+                      placeholder="Enter email address"
+                      value={newAdmin.email}
+                      onChange={(e) => handleAdminChange('email', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="admin-password">Password</Label>
+                    <Input
+                      id="admin-password"
+                      type="password"
+                      placeholder="Enter password"
+                      value={newAdmin.password}
+                      onChange={(e) => handleAdminChange('password', e.target.value)}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="admin-password">Password</Label>
-                  <Input 
-                    id="admin-password" 
-                    type="password"
-                    placeholder="Enter password"
-                    value={newAdmin.password}
-                    onChange={(e) => handleAdminChange('password', e.target.value)}
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="admin-phone">Phone Number</Label>
-                  <Input 
-                    id="admin-phone" 
-                    type="tel"
-                    placeholder="Enter phone number"
-                    value={newAdmin.phone}
-                    onChange={(e) => handleAdminChange('phone', e.target.value)}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="admin-phone">Phone Number</Label>
+                    <Input
+                      id="admin-phone"
+                      type="tel"
+                      placeholder="Enter phone number"
+                      value={newAdmin.phone}
+                      onChange={(e) => handleAdminChange('phone', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="admin-role">Role</Label>
+                    <Select
+                      value={newAdmin.profile}
+                      onValueChange={(value) => handleAdminChange('profile', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select admin role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(USER_ROLES).map(([key, value]) => <SelectItem value={key} key={key}>{value}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="admin-role">Role</Label>
-                  <Select 
-                    value={newAdmin.profile}
-                    onValueChange={(value) => handleAdminChange('profile', value)}
+                  <Label htmlFor="admin-payment-method">Default Payment Method</Label>
+                  <Select
+                    value={newAdmin.default_payment_method}
+                    onValueChange={(value) => handleAdminChange('default_payment_method', value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select admin role" />
+                      <SelectValue placeholder="Select default payment method" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(USER_ROLES).map(([key, value]) => <SelectItem value={key} key={key}>{value}</SelectItem>)}
+                      <SelectItem value="cash">Cash</SelectItem>
+                      <SelectItem value="card">Card</SelectItem>
+                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="admin-payment-method">Default Payment Method</Label>
-                <Select 
-                  value={newAdmin.default_payment_method}
-                  onValueChange={(value) => handleAdminChange('default_payment_method', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select default payment method" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="card">Card</SelectItem>
-                    <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* <div className="space-y-2">
+                {/* <div className="space-y-2">
                 <Label htmlFor="admin-auth-id">User Auth ID</Label>
                 <Input 
                   id="admin-auth-id" 
@@ -509,20 +510,20 @@ export default function SettingsPage() {
                 <p className="text-sm text-gray-500">This ID will be provided by Supabase Auth after user registration</p>
               </div> */}
 
-              <div className="pt-4 space-y-2 text-sm text-gray-500">
-                <p>Created by: {user.first_name} {user.last_name}</p>
-                <p>Created date: {new Date().toLocaleDateString()}</p>
-                <p>Last modified by: {user.first_name} {user.last_name}</p>
-                <p>Last modified date: {new Date().toLocaleDateString()}</p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={handleAddAdmin}>
-                <Shield className="mr-2 h-4 w-4" />
-                Add Admin User
-              </Button>
-            </CardFooter>
-          </Card>
+                <div className="pt-4 space-y-2 text-sm text-gray-500">
+                  <p>Created by: {user.first_name} {user.last_name}</p>
+                  <p>Created date: {new Date().toLocaleDateString()}</p>
+                  <p>Last modified by: {user.first_name} {user.last_name}</p>
+                  <p>Last modified date: {new Date().toLocaleDateString()}</p>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button onClick={handleAddAdmin}>
+                  <Shield className="mr-2 h-4 w-4" />
+                  Add Admin User
+                </Button>
+              </CardFooter>
+            </Card>}
         </TabsContent>
       </Tabs>
     </DashboardLayout>
