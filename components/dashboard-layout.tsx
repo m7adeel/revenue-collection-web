@@ -11,18 +11,24 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAuthStore } from "@/providers/authStoreProvider"
 import { supabase } from "@/utils/supabase"
 import { toast } from "./ui/use-toast"
+import { getUserData } from "@/services/utils"
 
 export default function DashboardLayout({ children }) {
   const router = useRouter()
   const pathname = usePathname()
   const [user, setUser] = useState(null)
   const [open, setOpen] = useState(false)
+  const [userData, setUserData] = useState(null)
   const { user: storeUser,signOut } = useAuthStore()
 
   useEffect(() => {
     supabase.auth.getUser().then(res => {
       if(!res.data.user) {
         router.replace("/login")
+      } else {
+        getUserData().then(data => {
+          setUserData(data)
+        })
       }
     })
   }, [])
@@ -100,11 +106,13 @@ export default function DashboardLayout({ children }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Avatar className="h-8 w-8">
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarFallback>
+                {userData?.first_name?.[0]}{userData?.last_name?.[0]}
+                </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm font-medium">{user?.name || "User"}</p>
-                <p className="text-xs text-gray-500 capitalize">{user?.role || "Collector"}</p>
+                <p className="text-sm font-medium">{userData?.first_name || "User"}</p>
+                <p className="text-xs text-gray-500 capitalize">{userData?.profile || "Collector"}</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={handleLogout}>
