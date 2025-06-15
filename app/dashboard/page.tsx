@@ -88,16 +88,6 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
-    // Check if user is logged in
-    // const storedUser = localStorage.getItem("user")
-    // if (!storedUser) {
-    //   router.push("/login")
-    //   return
-    // }
-
-    // setUser(JSON.parse(storedUser))
-
-    // Monitor online status
     const handleOnline = () => setIsOnline(true)
     const handleOffline = () => setIsOnline(false)
 
@@ -184,12 +174,6 @@ export default function DashboardPage() {
       setUser(updatedUser)
       localStorage.setItem("user", JSON.stringify(updatedUser))
     }
-  }
-
-  const handleLogout = () => {
-    supabase.auth.signOut().then(() => {
-      router.replace('/login')
-    })
   }
 
   const handleNavigation = () => {

@@ -9,6 +9,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAuthStore } from "@/providers/authStoreProvider"
+import { supabase } from "@/utils/supabase"
+import { toast } from "./ui/use-toast"
 
 export default function DashboardLayout({ children }) {
   const router = useRouter()
@@ -18,24 +20,17 @@ export default function DashboardLayout({ children }) {
   const { user: storeUser,signOut } = useAuthStore()
 
   useEffect(() => {
-    // Check if user is logged in
-    // const storedUser = localStorage.getItem("user")
-    if (!storeUser) {
-      router.push("/login")
-      return
-    }
-
-    setUser(storeUser)
-  }, [router])
+    supabase.auth.getUser().then(res => {
+      if(!res.data.user) {
+        router.replace("/login")
+      }
+    })
+  }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem("user")
-    signOut()
-    router.push("/login")
-  }
-
-  const handleNavigation = () => {
-    setOpen(false)
+    supabase.auth.signOut().then(res => {
+      router.replace("/login")
+    })
   }
 
   const isActive = (path) => {

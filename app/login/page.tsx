@@ -10,9 +10,12 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useAuthStore } from "@/providers/authStoreProvider"
+import { supabase } from "@/utils/supabase"
+import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [email, setEmail] = useState("")
@@ -24,41 +27,42 @@ export default function LoginPage() {
     setIsLoading(true)
     setError("")
 
-    if (user) {
-      router.push("/dashboard")
-    }
-
-    // Simulate authentication
     try {
-      // In a real app, this would be an API call to authenticate
-      // await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Store auth state in localStorage for offline access
-
-      // localStorage.setItem(
-      //   "user",
-      //   JSON.stringify({
-      //     id: "1",
-      //     name: "John Doe",
-      //     role: "collector",
-      //     lastSync: new Date().toISOString(),
-      //   }),
-      // )
-
-      // router.push("/dashboard")
       await signIn(email, password)
+      supabase.auth.getUser().then(user => {
+        if(user.data.user) {
+          router.replace("/dashboard")
+          toast({
+            title: 'Login Successful',
+            description: 'Welcome back! Redirecting to dashboard...',
+            variant: 'default'
+          })
+        } else { 
+          toast({
+            title: 'Invalid Credentials',
+            description:'Invalid username or password. Please try again.',
+            variant: 'destructive'
+          })
+        }
+      })
     } catch (err) {
       setError("Invalid username or password. Please try again.")
+      toast({
+        title: 'Invalid Credentials',
+        description:'Invalid username or password. Please try again.',
+        variant: 'destructive'
+      })
     } finally {
       setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    const user = localStorage.getItem("user")
-    if (user) {
-      router.push("/dashboard")
-    }
+    supabase.auth.getUser().then(user => {
+      if(user.data.user) {
+        router.replace("/dashboard")
+      }
+    })
   }, [])
 
   return (
