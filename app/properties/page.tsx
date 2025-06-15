@@ -341,6 +341,7 @@ export default function PropertiesPage() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleNewProperty = async (formData: any) => {
     try {
@@ -388,6 +389,7 @@ export default function PropertiesPage() {
   }
 
   const refreshProperties = async () => {
+    setIsLoading(true)
     const { data: propertiesWithOwners, error } = await supabase
       .from("property")
       .select(`
@@ -405,6 +407,7 @@ export default function PropertiesPage() {
     } else {
       setProperties(propertiesWithOwners)
     }
+    setIsLoading(false)
   }
 
   const handleViewProperty = (property: Property) => {
@@ -498,6 +501,13 @@ export default function PropertiesPage() {
                 </Button>
                 <Button variant="outline" size="icon">
                   <Download className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={refreshProperties} disabled={isLoading}>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>

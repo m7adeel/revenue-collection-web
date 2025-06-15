@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Building2, CreditCard, Download, Filter, Home, Loader2, MoreVertical, PenIcon, Phone, Plus, Search, Trash, User } from "lucide-react"
+import { Building2, CreditCard, Download, Filter, Home, Loader2, MoreVertical, PenIcon, Phone, Plus, RefreshCw, Search, Trash, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -188,6 +188,13 @@ export default function payersPage() {
                   </Button>
                   <Button variant="outline" size="icon">
                     <Download className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={fetchpayers} disabled={isLoading}>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>

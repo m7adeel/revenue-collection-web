@@ -112,6 +112,91 @@ export default function Invoices() {
   const [pageSize, setPageSize] = useState(10)
   const [totalItems, setTotalItems] = useState(0)
 
+  const fetchData = async () => {
+    setIsLoading(true)
+    try {
+      // Fetch invoices
+      const { data: invoicesWithPayers, error: invoicesError } = await supabase
+        .from("invoice")
+        .select(`
+          *,
+          payer: payer (
+            id,
+            first_name,
+            last_name,
+            email
+          ),
+          created_by: user (
+            id,
+            first_name,
+            last_name,
+            phone
+          )
+        `)
+
+      if (invoicesError) {
+        console.error('Error fetching invoices:', invoicesError)
+        toast({
+          title: "Error",
+          description: "Failed to fetch invoices",
+          variant: "destructive"
+        })
+        return
+      }
+
+      setInvoices(invoicesWithPayers || [])
+      setFilteredInvoices(invoicesWithPayers || [])
+      setTotalItems(invoicesWithPayers?.length || 0)
+
+      // Fetch payers
+      const { data: payers, error: payersError } = await supabase
+        .from("payer")
+        .select("id, first_name, last_name, email")
+
+      if (payersError) {
+        console.error('Error fetching payers:', payersError)
+        toast({
+          title: "Error",
+          description: "Failed to fetch payers",
+          variant: "destructive"
+        })
+        return
+      }
+
+      setPayers(payers || [])
+
+      // Fetch properties
+      const { data: properties, error: propertiesError } = await supabase
+        .from("property")
+        .select("id, address, type")
+
+      if (propertiesError) {
+        console.error('Error fetching properties:', propertiesError)
+        toast({
+          title: "Error",
+          description: "Failed to fetch properties",
+          variant: "destructive"
+        })
+        return
+      }
+
+      setProperties(properties || [])
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      toast({
+        title: "Error",
+        description: "Failed to fetch data",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
   const handleNewInvoice = async (formData: NewInvoiceFormData) => {
     try {
       setIsLoading(true)
@@ -210,62 +295,6 @@ export default function Invoices() {
       setIsLoading(false)
     }
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      // Fetch invoices
-      const { data: invoices, error: invoicesError } = await supabase
-        .from("invoice")
-        .select(`
-          *,
-          payer: payer (
-            id,
-            first_name,
-            last_name,
-            email
-          ),
-          created_by: user (
-            id,
-            first_name,
-            last_name,
-            phone
-          )
-        `)
-
-      if (invoicesError) {
-        console.error('Error fetching invoices:', invoicesError)
-        return
-      }
-
-      setInvoices(invoices || [])
-
-      // Fetch payers
-      const { data: payers, error: payersError } = await supabase
-        .from("payer")
-        .select("id, first_name, last_name, email")
-
-      if (payersError) {
-        console.error('Error fetching payers:', payersError)
-        return
-      }
-
-      setPayers(payers || [])
-
-      // Fetch properties
-      const { data: properties, error: propertiesError } = await supabase
-        .from("property")
-        .select("id, address, type")
-
-      if (propertiesError) {
-        console.error('Error fetching properties:', propertiesError)
-        return
-      }
-
-      setProperties(properties || [])
-    }
-
-    fetchData()
-  }, [])
 
   useEffect(() => {
     const filtered = invoices.filter(invoice => {
@@ -449,6 +478,13 @@ export default function Invoices() {
                 </Dialog>
                 <Button variant="outline" size="icon">
                   <Download className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={fetchData} disabled={isLoading}>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -1112,117 +1148,3 @@ function EditInvoiceDialog({
     </Dialog>
   )
 }
-
-const samplepayer = [
-  {
-    id: 1,
-    name: "Johnson Enterprises",
-  },
-  {
-    id: 2,
-    name: "Sarah's Boutique",
-  },
-  {
-    id: 3,
-    name: "Green Valley Farms",
-  },
-  {
-    id: 4,
-    name: "Tech Solutions Inc.",
-  },
-  {
-    id: 5,
-    name: "Riverside Apartments",
-  },
-]
-
-const sampleinvoices = [
-  {
-    id: 1,
-    name: "Downtown Office Building",
-    address: "123 Main Street",
-    type: "Commercial",
-    vendorId: 1,
-    vendorName: "Johnson Enterprises",
-    taxAmount: "2500.00",
-    status: "Active",
-    lastAssessment: "Jan 15, 2025",
-  },
-  {
-    id: 2,
-    name: "Retail Shop",
-    address: "45 Fashion Avenue",
-    type: "Commercial",
-    vendorId: 2,
-    vendorName: "Sarah's Boutique",
-    taxAmount: "1200.00",
-    status: "Active",
-    lastAssessment: "Feb 20, 2025",
-  },
-  {
-    id: 3,
-    name: "North Field",
-    address: "Rural Route 7, Plot 1",
-    type: "Agricultural",
-    vendorId: 3,
-    vendorName: "Green Valley Farms",
-    taxAmount: "850.00",
-    status: "Active",
-    lastAssessment: "Mar 5, 2025",
-  },
-  {
-    id: 4,
-    name: "South Field",
-    address: "Rural Route 7, Plot 2",
-    type: "Agricultural",
-    vendorId: 3,
-    vendorName: "Green Valley Farms",
-    taxAmount: "750.00",
-    status: "Active",
-    lastAssessment: "Mar 5, 2025",
-  },
-  {
-    id: 5,
-    name: "Tech Hub Office",
-    address: "78 Innovation Park",
-    type: "Commercial",
-    vendorId: 4,
-    vendorName: "Tech Solutions Inc.",
-    taxAmount: "1800.00",
-    status: "Active",
-    lastAssessment: "Jan 30, 2025",
-  },
-  {
-    id: 6,
-    name: "Riverside Building A",
-    address: "100 Riverside Drive, Building A",
-    type: "Residential",
-    vendorId: 5,
-    vendorName: "Riverside Apartments",
-    taxAmount: "3500.00",
-    status: "Active",
-    lastAssessment: "Feb 10, 2025",
-  },
-  {
-    id: 7,
-    name: "Riverside Building B",
-    address: "100 Riverside Drive, Building B",
-    type: "Residential",
-    vendorId: 5,
-    vendorName: "Riverside Apartments",
-    taxAmount: "3200.00",
-    status: "Active",
-    lastAssessment: "Feb 10, 2025",
-  },
-  {
-    id: 8,
-    name: "Warehouse Facility",
-    address: "200 Industrial Zone",
-    type: "Industrial",
-    vendorId: 1,
-    vendorName: "Johnson Enterprises",
-    taxAmount: "1950.00",
-    status: "Active",
-    lastAssessment: "Mar 15, 2025",
-  },
-]

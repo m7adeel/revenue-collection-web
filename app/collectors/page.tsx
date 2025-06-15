@@ -79,29 +79,41 @@ export default function CollectorsPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const { user } = useAuthStore()
 
-  useEffect(() => {
-    const fetchCollectors = async () => {
-      try {
-        const { data: collectors, error } = await supabase
-          .from("user")
-          .select(`
-            *
-          `)
+  const fetchCollectors = async () => {
+    setIsLoading(true)
+    try {
+      const { data: collectors, error } = await supabase
+        .from("user")
+        .select(`
+          *
+        `)
+        .order('created_date', { ascending: false })
 
-        if (error) {
-          console.error('Error fetching collectors:', error)
-          return
-        }
-
-        setCollectors(collectors || [])
-        setFilteredCollectors(collectors || [])
-      } catch (error) {
-        console.error('Error:', error)
-      } finally {
-        setIsLoading(false)
+      if (error) {
+        console.error('Error fetching collectors:', error)
+        toast({
+          title: "Error",
+          description: "Failed to fetch collectors",
+          variant: "destructive"
+        })
+        return
       }
-    }
 
+      setCollectors(collectors || [])
+      setFilteredCollectors(collectors || [])
+    } catch (error) {
+      console.error('Error:', error)
+      toast({
+        title: "Error",
+        description: "Failed to fetch collectors",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchCollectors()
   }, [])
 
@@ -309,6 +321,13 @@ export default function CollectorsPage() {
                 </Dialog>
                 <Button variant="outline" size="icon">
                   <Download className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" onClick={fetchCollectors} disabled={isLoading}>
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
