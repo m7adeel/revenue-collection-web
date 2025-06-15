@@ -180,10 +180,6 @@ export default function DashboardPage() {
     setSheetOpen(false)
   }
 
-  if (isLoading) {
-    return <DashboardSkeleton />
-  }
-
   return (
     <DashboardLayout>
       <div className="mb-6">
