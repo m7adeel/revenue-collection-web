@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar - Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white border-r">
+      <aside className="hidden lg:flex flex-col w-64 bg-white border-r h-screen sticky top-0">
         <div className="p-4 border-b">
           <div className="flex items-center space-x-2">
             <Building2 className="h-6 w-6 text-emerald-600" />
@@ -48,8 +48,8 @@ export default function DashboardLayout({ children }) {
           </div>
         </div>
 
-        <ScrollArea className="flex-1 py-4">
-          <nav className="space-y-1 px-2">
+        <div className="flex-1 overflow-hidden">
+          <nav className="space-y-1 px-2 py-4">
             <Link href="/dashboard" className="block">
               <Button variant={isActive("/dashboard") ? "secondary" : "ghost"} className="w-full justify-start">
                 <Home className="h-5 w-5" />
@@ -94,7 +94,7 @@ export default function DashboardLayout({ children }) {
               </Button>
             </Link>
           </nav>
-        </ScrollArea>
+        </div>
 
         <div className="p-4 border-t">
           <div className="flex items-center justify-between">
